@@ -1,31 +1,45 @@
+/* eslint-disable no-console */
 import express from 'express';
-import { mapOrder } from '~/utils/sorts.js';
+import exitHook from 'async-exit-hook';
+import { CONNECT_DB, CLOSE_DB, GET_DB } from '~/config/mongodb';
+import { env } from '~/config/environment';
+const START_SERVER = () => {
+  const app = express();
+  app.get('/', async (req, res) => {
+    res.end('<h1>Hello World!</h1><hr>');
+  });
 
-const app = express();
+  app.listen(env.APP_PORT, env.APP_HOST, () => {
+    // eslint-disable-next-line no-console
+    console.log(`Trello Server hello ${env.AUTHOR} is running at http://${env.APP_HOST}:${env.APP_PORT}/`);
+  });
+  // clean up trc khi dừng server
+  exitHook(() => {
+    CLOSE_DB();
+  });
+};
 
-const hostname = 'localhost';
-const port = 8386;
+// Chỉ khi kết nối DB thành công mới gọi START_SERVER()
 
-app.get('/', (req, res) => {
-  // Test Absolute import mapOrder
-  // eslint-disable-next-line no-console
-  console.log(
-    mapOrder(
-      [
-        { id: 'id-1', name: 'One' },
-        { id: 'id-2', name: 'Two' },
-        { id: 'id-3', name: 'Three' },
-        { id: 'id-4', name: 'Four' },
-        { id: 'id-5', name: 'Five' }
-      ],
-      ['id-5', 'id-4', 'id-2', 'id-3', 'id-1'],
-      'id'
-    )
-  );
-  res.end('<h1>Hello World!</h1><hr>');
-});
+(async () => {
+  try {
+    console.log('1. Connecting to MongoDB Cloud Atlas....');
+    await CONNECT_DB();
+    console.log('2. Connected to MongoDB Cloud Atlas....');
 
-app.listen(port, hostname, () => {
-  // eslint-disable-next-line no-console
-  console.log(`Trello Server is running at http://${hostname}:${port}/`);
-});
+    START_SERVER();
+  } catch (error) {
+    console.error(error);
+    // Dừng server
+    process.exit(0);
+  }
+})();
+// Chỉ khi kết nối DB thành công mới gọi START_SERVER()
+// CONNECT_DB()
+//   .then(() => console.log('Connected to MongoDB Atlas'))
+//   .then(() => START_SERVER())
+//   .catch((error) => {
+//     console.error(error);
+//     // Dừng server
+//     process.exit(0);
+//   });
