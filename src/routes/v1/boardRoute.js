@@ -10,4 +10,6 @@ Router.route('/')
     res.status(StatusCodes.OK).json({ message: 'APIs get list borads' });
   })
   .post(boardValidation.createNew, boardController.createNew);
+
+Router.route('/:id').get(boardController.getDetails).put();
 export const boardRoute = Router;
