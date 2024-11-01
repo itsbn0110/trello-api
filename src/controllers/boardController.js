@@ -1,10 +1,12 @@
 // example controller
 import { StatusCodes } from 'http-status-codes';
-
+import { boardService } from '~/services/boardService';
 const createNew = async (req, res, next) => {
   try {
-    console.log('req.body', req.body);
-    res.status(StatusCodes.CREATED).json({ message: 'Created New from Controller' });
+    // console.log('req.body', req.body);
+
+    const createdBoard = await boardService.createNew(req.body);
+    res.status(StatusCodes.CREATED).json(createdBoard);
   } catch (e) {
     next(e);
   }
