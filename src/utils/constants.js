@@ -3,7 +3,7 @@
 // ..vv ví dụ sau này sẽ deploy lên domain chính thức ,...
 // constant
 
-export const WHITELIST_DOMAINS = ['https://trello-ui-cyan.vercel.app/'];
+export const WHITELIST_DOMAINS = ['https://trello-ui-cyan.vercel.app'];
 
 export const BOARD_TYPES = {
   PUBLIC: 'public',
