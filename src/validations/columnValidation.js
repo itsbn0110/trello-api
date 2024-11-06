@@ -39,7 +39,23 @@ const update = async (req, res, next) => {
     next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, new Error(e).message));
   }
 };
+
+const deleteItem = async (req, res, next) => {
+  // Có thể custom messages của JOI để ghì đè lại và trả về message theo ý muốn
+  // VD: title: Joi.string().required().min(3).max(50).trim().strict().messages({'any.required': 'title is required hehehe'})
+  // Không dùng required () trong trường hợp Update
+  const correctCondition = Joi.object({
+    id: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)
+  });
+  try {
+    await correctCondition.validateAsync(req.params);
+    next();
+  } catch (e) {
+    next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, new Error(e).message));
+  }
+};
 export const columnValidation = {
   createNew,
-  update
+  update,
+  deleteItem
 };

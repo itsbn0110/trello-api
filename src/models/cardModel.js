@@ -82,10 +82,24 @@ const update = async (cardId, updateData) => {
   }
 };
 
+const deleteAllCardByColumnId = async (columnId) => {
+  try {
+    const result = await GET_DB()
+      .collection(CARD_COLLECTION_NAME)
+      .deleteMany({
+        columnId: new ObjectId(String(columnId))
+      });
+    return result;
+  } catch (e) {
+    throw new Error(e);
+  }
+};
+
 export const cardModel = {
   CARD_COLLECTION_NAME,
   CARD_COLLECTION_SCHEMA,
   createNew,
   findOneById,
-  update
+  update,
+  deleteAllCardByColumnId
 };
