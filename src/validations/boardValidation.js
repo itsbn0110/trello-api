@@ -3,6 +3,7 @@ import Joi from 'joi';
 import { StatusCodes } from 'http-status-codes';
 import ApiError from '~/utils/ApiError';
 import { BOARD_TYPES } from '~/utils/constants';
+import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators';
 
 const createNew = async (req, res, next) => {
   // Có thể custom messages của JOI để ghì đè lại và trả về message theo ý muốn
@@ -42,7 +43,26 @@ const update = async (req, res, next) => {
   }
 };
 
+const moveCardToDifferentColumn = async (req, res, next) => {
+  const correctCondition = Joi.object({
+    currentCardId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
+    prevColumnId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
+    prevCardOrderIds: Joi.array().required().items(Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)),
+    nextColumnId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
+    nextCardOrderIds: Joi.array().required().items(Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE))
+  });
+  try {
+    // abortearly trả về tất cả lỗi validation
+    // Đối với trường hợp update, cho phép Unknown để không caanf đẩy một số field lên
+    await correctCondition.validateAsync(req.body, { abortEarly: false });
+    // Validate dữ liệu xong xuôi hợp lệ thì cho request đi tiếp sang controller
+    next();
+  } catch (e) {
+    next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, new Error(e).message));
+  }
+};
 export const boardValidation = {
   createNew,
-  update
+  update,
+  moveCardToDifferentColumn
 };

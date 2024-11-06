@@ -1,4 +1,4 @@
-import Joi, { valid } from 'joi';
+import Joi from 'joi';
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators';
 import { GET_DB } from '~/config/mongodb';
 import { ObjectId } from 'mongodb';
@@ -14,6 +14,8 @@ const COLUMN_COLLECTION_SCHEMA = Joi.object({
   updatedAt: Joi.date().timestamp('javascript').default(null),
   _destroy: Joi.boolean().default(false)
 });
+
+const INVALID_UPDATE_FIELDS = ['_id', 'createdAt', 'boardId'];
 
 const validateBeforeCreate = async (data) => {
   // abortEarly : true, trả về lỗi đầu tiên gặp,lần lượt các lỗi, abortEarly: false trả về hết tất cả các lỗi trong 1 lần
@@ -65,10 +67,43 @@ const pushCardOrderIds = async (card) => {
     throw new Error(e);
   }
 };
+
+const update = async (columnId, updateData) => {
+  try {
+    Object.keys(updateData).forEach((fieldName) => {
+      if (INVALID_UPDATE_FIELDS.includes(fieldName)) {
+        delete updateData[fieldName];
+      }
+    });
+
+    // Đối với những dữ liệu liên quan đến ObjectId, biến đổi ở đây:
+    if (updateData.cardOrderIds) {
+      updateData.cardOrderIds = updateData.cardOrderIds.map((_id) => new ObjectId(String(_id)));
+    }
+    const result = await GET_DB()
+      .collection(COLUMN_COLLECTION_NAME)
+      .findOneAndUpdate(
+        {
+          _id: new ObjectId(String(columnId))
+        },
+        {
+          $set: updateData
+        },
+        {
+          // trả về 1 bản ghi đã được cập nhật
+          returnDocument: 'after'
+        }
+      );
+    return result;
+  } catch (e) {
+    throw new Error(e);
+  }
+};
 export const columnModel = {
   COLUMN_COLLECTION_NAME,
   COLUMN_COLLECTION_SCHEMA,
   createNew,
   findOneById,
-  pushCardOrderIds
+  pushCardOrderIds,
+  update
 };

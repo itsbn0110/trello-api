@@ -1,6 +1,6 @@
 // example model
 import Joi from 'joi';
-import { ObjectId, ReturnDocument } from 'mongodb';
+import { ObjectId } from 'mongodb';
 import { GET_DB } from '~/config/mongodb';
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators';
 import { BOARD_TYPES } from '~/utils/constants';
@@ -111,6 +111,10 @@ const update = async (boardId, updateData) => {
         delete updateData[fieldName];
       }
     });
+
+    if (updateData.columnOrderIds) {
+      updateData.columnOrderIds = updateData.columnOrderIds.map((_id) => new ObjectId(String(_id)));
+    }
     const result = await GET_DB()
       .collection(BOARD_COLLECTION_NAME)
       .findOneAndUpdate(
