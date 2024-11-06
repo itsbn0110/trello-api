@@ -1,6 +1,6 @@
 /* eslint-disable no-useless-catch */
-import { StatusCodes } from 'http-status-codes';
 import { boardModel } from '~/models/boardModel';
+import { StatusCodes } from 'http-status-codes';
 import ApiError from '~/utils/ApiError';
 import { slugify } from '~/utils/formatters';
 import { cloneDeep } from 'lodash';

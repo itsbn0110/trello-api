@@ -104,6 +104,27 @@ const pushColumnOrderIds = async (column) => {
   }
 };
 
+// Lấy 1 phần tử columnId ra khỏi mảng columnOrderIds
+// Dùng $pull trong mongodb ở trường hợp này để lấy một phần tử ra khỏi mảng rồi xóa nó đi
+const pullColumnOrderIds = async (column) => {
+  try {
+    const result = await GET_DB()
+      .collection(BOARD_COLLECTION_NAME)
+      .findOneAndUpdate(
+        {
+          _id: new ObjectId(String(column.boardId))
+        },
+        { $pull: { columnOrderIds: new ObjectId(String(column._id)) } },
+        {
+          // trả về 1 bản ghi đã được cập nhật
+          returnDocument: 'after'
+        }
+      );
+    return result;
+  } catch (e) {
+    throw new Error(e);
+  }
+};
 const update = async (boardId, updateData) => {
   try {
     Object.keys(updateData).forEach((fieldName) => {
@@ -140,6 +161,7 @@ export const boardModel = {
   findOneById,
   getDetails,
   pushColumnOrderIds,
+  pullColumnOrderIds,
   update
 };
 
