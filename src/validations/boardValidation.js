@@ -28,8 +28,8 @@ const update = async (req, res, next) => {
   // VD: title: Joi.string().required().min(3).max(50).trim().strict().messages({'any.required': 'title is required hehehe'})
   // Không dùng required () trong trường hợp Update
   const correctCondition = Joi.object({
-    title: Joi.string().min(3).max(50).trim().strict(),
-    description: Joi.string().min(3).max(256).trim().strict(),
+    title: Joi.string().min(3).max(50).strict(),
+    description: Joi.string().min(3).max(256).strict(),
     type: Joi.string().valid(BOARD_TYPES.PUBLIC, BOARD_TYPES.PRIVATE)
   });
   try {
@@ -47,7 +47,9 @@ const moveCardToDifferentColumn = async (req, res, next) => {
   const correctCondition = Joi.object({
     currentCardId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
     prevColumnId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
-    prevCardOrderIds: Joi.array().required().items(Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)),
+    prevCardOrderIds: Joi.array()
+      .required()
+      .items(Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)),
     nextColumnId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
     nextCardOrderIds: Joi.array().required().items(Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE))
   });
