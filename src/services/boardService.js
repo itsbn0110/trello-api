@@ -4,6 +4,9 @@ import { boardModel } from '~/models/boardModel';
 import ApiError from '~/utils/ApiError';
 import { slugify } from '~/utils/formatters';
 import { cloneDeep } from 'lodash';
+import { columnModel } from '~/models/columnModel';
+import { cardModel } from '~/models/cardModel';
+
 // example Service
 const createNew = async (data) => {
   try {
@@ -56,8 +59,35 @@ const update = async (boardId, reqBody) => {
     throw e;
   }
 };
+
+const moveCardToDifferentColumn = async (reqBody) => {
+  try {
+    // * Cập nhật mảng cardOrderIDs của Column ban đầu chứa nó, bản chất là xóa cái _id của Card ra khỏi mảng)
+    // * Cập nhật mảng cardOrderIds của Column tiếp theo (Bản chất là thêm _id của Card vào mảng)
+    // * Cập nhật lại trường columnId mới của cái Card đã kéo
+
+    await columnModel.update(reqBody.prevColumnId, {
+      cardOrderIds: reqBody.prevCardOrderIds,
+      updatedAt: Date.now()
+    });
+
+    await columnModel.update(reqBody.nextColumnId, {
+      cardOrderIds: reqBody.nextCardOrderIds,
+      updatedAt: Date.now()
+    });
+
+    await cardModel.update(reqBody.currentCardId, {
+      columnId: reqBody.nextColumnId
+    });
+
+    return { updatedResultL: 'Successfully!' };
+  } catch (e) {
+    throw e;
+  }
+};
 export const boardService = {
   createNew,
   getDetails,
-  update
+  update,
+  moveCardToDifferentColumn
 };
