@@ -15,9 +15,9 @@ const createNew = async (data) => {
       slug: slugify(data.title)
     };
 
-    const result = await boardModel.createNew(newBoard);
-    const newResult = await boardModel.findOneById(result.insertedId.toString());
-    return newResult;
+    const createdBoard = await boardModel.createNew(newBoard);
+    const getNewBoard = await boardModel.findOneById(createdBoard.insertedId.toString());
+    return getNewBoard;
   } catch (e) {
     throw e;
   }
