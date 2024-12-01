@@ -51,7 +51,7 @@ const createNew = async (reqBody) => {
 const verifyAccount = async (reqBody) => {
   try {
     // Query User trong Database
-    const existUser = await userModel.findOneEmail(reqBody.email);
+    const existUser = await userModel.findOneByEmail(reqBody.email);
 
     // Các bước kiểm tra cần thiết
     if (!existUser) throw new ApiError(StatusCodes.NOT_FOUND, 'Account not found!');
@@ -102,6 +102,7 @@ const login = async (reqBody) => {
       userInfo,
       env.ACCESS_TOKEN_SECRET_SIGNATURE,
       env.ACCESS_TOKEN_LIFE
+      // 5
     );
 
     const refreshToken = await JwtProvider.generateToken(
