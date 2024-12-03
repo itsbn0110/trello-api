@@ -101,15 +101,15 @@ const login = async (reqBody) => {
     const accessToken = await JwtProvider.generateToken(
       userInfo,
       env.ACCESS_TOKEN_SECRET_SIGNATURE,
-      // env.ACCESS_TOKEN_LIFE
-      5
+      env.ACCESS_TOKEN_LIFE
+      // 5
     );
 
     const refreshToken = await JwtProvider.generateToken(
       userInfo,
       env.REFRESH_TOKEN_SECRET_SIGNATURE,
-      // env.REFRESH_TOKEN_LIFE
-      15
+      env.REFRESH_TOKEN_LIFE
+      // 15
     );
 
     // Trả về thông tin của user kèm theo 2 cái token vừa tạo ra
@@ -134,8 +134,8 @@ const refreshToken = async (clientRefreshToken) => {
     const accessToken = await JwtProvider.generateToken(
       userInfo, //
       env.ACCESS_TOKEN_SECRET_SIGNATURE,
-      // env.ACCESS_TOKEN_LIFE // 1 tiếng
-      5
+      env.ACCESS_TOKEN_LIFE // 1 tiếng
+      // 5
     );
 
     return { accessToken };
@@ -143,9 +143,41 @@ const refreshToken = async (clientRefreshToken) => {
     throw e;
   }
 };
+
+const update = async (userId, reqBody) => {
+  try {
+    // Query User và kiểm tra cho chắc
+    const existUser = await userModel.findOneById(userId);
+    if (!existUser) throw new ApiError(StatusCodes.NOT_FOUND, 'Account not found!');
+    if (!existUser.isActive) throw new ApiError(StatusCodes.NOT_ACCEPTABLE, 'Your account is not active!');
+
+    // Khởi tạo kết quả updated User ban đầu là empty
+    let updatedUser = {};
+
+    // Trường hợp change password
+    if (reqBody.current_password && reqBody.new_password) {
+      // kiểm tra xem cái current_password có đúng hay không
+      if (!bcryptjs.compareSync(reqBody.current_password, existUser.password)) {
+        throw new ApiError(StatusCodes.NOT_ACCEPTABLE, 'Your Current Password is incorrect!');
+      }
+      // Nếu như current_password là đúng chúng ta sẽ hash một cái mật khẩu mới và update lại vào DB
+      updatedUser = await userModel.update(existUser._id, {
+        password: bcryptjs.hashSync(reqBody.new_password, 8)
+      });
+    } else {
+      // Trường hợp update các thông tin chung, ví dụ như displayName
+      updatedUser = await userModel.update(existUser._id, reqBody);
+    }
+    return pickUser(updatedUser);
+  } catch (e) {
+    throw e;
+  }
+};
+
 export const userService = {
   createNew,
   verifyAccount,
   login,
-  refreshToken
+  refreshToken,
+  update
 };
