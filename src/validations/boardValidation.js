@@ -4,6 +4,7 @@ import { StatusCodes } from 'http-status-codes';
 import ApiError from '~/utils/ApiError';
 import { BOARD_TYPES } from '~/utils/constants';
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators';
+import { boardService } from '~/services/boardService';
 
 const createNew = async (req, res, next) => {
   // Có thể custom messages của JOI để ghì đè lại và trả về message theo ý muốn
@@ -63,6 +64,7 @@ const moveCardToDifferentColumn = async (req, res, next) => {
     next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, new Error(e).message));
   }
 };
+
 export const boardValidation = {
   createNew,
   update,

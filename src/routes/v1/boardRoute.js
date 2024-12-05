@@ -1,15 +1,12 @@
 // example routes
 import express from 'express';
-import { StatusCodes } from 'http-status-codes';
 import { boardValidation } from '~/validations/boardValidation';
 import { boardController } from '~/controllers/boardController';
 import { authMiddleware } from '~/middlewares/authMiddlewares';
 const Router = express.Router();
 
 Router.route('/')
-  .get(authMiddleware.isAuthorized, (req, res) => {
-    res.status(StatusCodes.OK).json({ message: 'APIs get list borads' });
-  })
+  .get(authMiddleware.isAuthorized, boardController.getBoards)
   .post(authMiddleware.isAuthorized, boardValidation.createNew, boardController.createNew);
 
 Router.route('/:id')
