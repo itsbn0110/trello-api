@@ -1,7 +1,7 @@
 import { StatusCodes } from 'http-status-codes';
+import ApiError from '~/utils/ApiError';
 import { userService } from '~/services/userService';
 import ms from 'ms';
-import ApiError from '~/utils/ApiError';
 const createNew = async (req, res, next) => {
   try {
     const createdUser = await userService.createNew(req.body);
@@ -78,8 +78,9 @@ const refreshToken = async (req, res, next) => {
 const update = async (req, res, next) => {
   try {
     const userId = req.jwtDecoded._id;
-    const updateUser = await userService.update(userId, req.body);
-
+    const userAvatarFile = req.file;
+    // console.log('userAvatarfile', userAvatarFile);
+    const updateUser = await userService.update(userId, req.body, userAvatarFile);
     res.status(StatusCodes.OK).json(updateUser);
   } catch (e) {
     next(e);

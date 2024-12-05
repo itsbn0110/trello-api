@@ -51,11 +51,8 @@ const login = async (req, res, next) => {
 const update = async (req, res, next) => {
   const correctCondition = Joi.object({
     displayName: Joi.string().trim().strict(),
-    current_password: Joi.string()
-      .required()
-      .pattern(PASSWORD_RULE)
-      .message(`current_password: ${PASSWORD_RULE_MESSAGE}`),
-    new_password: Joi.string().required().pattern(PASSWORD_RULE).message(`new_password: ${PASSWORD_RULE_MESSAGE}`)
+    current_password: Joi.string().pattern(PASSWORD_RULE).message(`current_password: ${PASSWORD_RULE_MESSAGE}`),
+    new_password: Joi.string().pattern(PASSWORD_RULE).message(`new_password: ${PASSWORD_RULE_MESSAGE}`)
   });
   try {
     // abortearly trả về tất cả lỗi validation

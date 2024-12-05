@@ -22,6 +22,7 @@ const START_SERVER = () => {
   app.use(cookieParser());
 
   app.use(cors(corsOptions));
+  // Cấu hình gửi data theo dạng json-object http qua server
 
   app.use(express.json());
 
