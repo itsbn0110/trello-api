@@ -5,7 +5,7 @@ import { boardRoute } from './boardRoute';
 import { columnRoute } from './columnRoute';
 import { cardRoute } from './cardRoute';
 import { userRoute } from './userRoute';
-
+import { invitationRoute } from './invitationRoute';
 const Router = express.Router();
 
 Router.get('/status', (req, res) => {
@@ -22,5 +22,7 @@ Router.use('/columns', columnRoute);
 Router.use('/cards', cardRoute);
 // User API
 Router.use('/users', userRoute);
+// Invitations
+Router.use('/invitations', invitationRoute);
 
 export const APIs_V1 = Router;

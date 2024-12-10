@@ -8,14 +8,14 @@ import { columnModel } from '~/models/columnModel';
 import { cardModel } from '~/models/cardModel';
 import { DEFAULT_PAGE, DEFAULT_ITEMS_PER_PAGE } from '~/utils/constants';
 // example Service
-const createNew = async (data) => {
+const createNew = async (userId, reqBody) => {
   try {
     const newBoard = {
-      ...data,
-      slug: slugify(data.title)
+      ...reqBody,
+      slug: slugify(reqBody.title)
     };
 
-    const createdBoard = await boardModel.createNew(newBoard);
+    const createdBoard = await boardModel.createNew(userId, newBoard);
     const getNewBoard = await boardModel.findOneById(createdBoard.insertedId.toString());
     return getNewBoard;
   } catch (e) {
@@ -23,9 +23,9 @@ const createNew = async (data) => {
   }
 };
 
-const getDetails = async (boardId) => {
+const getDetails = async (userId, boardId) => {
   try {
-    const board = await boardModel.getDetails(boardId);
+    const board = await boardModel.getDetails(userId, boardId);
     if (!board) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Board not found!!');
     }
