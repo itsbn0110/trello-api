@@ -8,14 +8,17 @@ import { env } from '~/config/environment';
 import { APIs_V1 } from '~/routes/v1/index';
 import { errorHandlingMiddleware } from '~/middlewares/errorHandlingMiddleware';
 import cookieParser from 'cookie-parser';
-
+// Xử lý socket real-time với gói socket.io
+// https://socket.io/get-started/chat/#integrating-socketio
+import http from 'http';
+import socketIo from 'socket.io';
+import { inviteUserToBoardSocket } from './sockets/inviteUserToBoardSocket';
 const START_SERVER = () => {
   const app = express();
   // không dùng cache phía trình duyệt (tạm thời )
+  // https://stackoverflow.com/a/53240717/8324172
   app.use((req, res, next) => {
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
-    res.setHeader('Pragma', 'no-cache');
-    res.setHeader('Expires', '0');
+    res.set('Cache-Control', 'no-store');
     next();
   });
   // Cấu hình cookieParser
@@ -32,15 +35,26 @@ const START_SERVER = () => {
   // Middleware xử lí lỗi tập trung
   app.use(errorHandlingMiddleware);
 
+  // Tạo một cái server mới bọc thằng app của express để làm real-time với socket.io
+  const server = http.createServer(app);
+  // Khởi tạo biến io với server và cors
+  const io = socketIo(server, { cors: corsOptions });
+
+  io.on('connection', (socket) => {
+    // Gọi các socket tùy theo tính năng
+    inviteUserToBoardSocket(socket);
+  });
   // Môi trường Production (support Render)
   if (env.BUILD_MODE === 'production') {
-    app.listen(process.env.PORT, () => {
+    // dùng server.listen thay vì app.listen vì server đã bao gồm express app và đã config socket.io
+    server.listen(process.env.PORT, () => {
       // eslint-disable-next-line no-console
       console.log(`3. Production: Trello Server hello ${env.AUTHOR} is running at ${process.env.PORT}`);
     });
   } else {
     // Môi trường Local Dev
-    app.listen(env.LOCAL_DEV_APP_PORT, env.LOCAL_DEV_APP_HOST, () => {
+    // dùng server.listen thay vì app.listen vì server đã bao gồm express app và đã config socket.io
+    server.listen(env.LOCAL_DEV_APP_PORT, env.LOCAL_DEV_APP_HOST, () => {
       // eslint-disable-next-line no-console
       console.log(
         `3.Local Dev: Trello Server hello ${env.AUTHOR} is running at http://${env.LOCAL_DEV_APP_HOST}:${env.LOCAL_DEV_APP_PORT}/`

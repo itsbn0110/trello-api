@@ -12,5 +12,5 @@ Router.route('/board').post(
 
 // Get invitations by User
 Router.route('/').get(authMiddleware.isAuthorized, invitationController.getInvitations);
-
+Router.route('/board/:invitationId').put(authMiddleware.isAuthorized, invitationController.updateBoardInvitations);
 export const invitationRoute = Router;
