@@ -252,6 +252,25 @@ const getBoards = async (userId, page, itemsPerPage) => {
   }
 };
 
+const pushMemberIds = async (boardId, userId) => {
+  try {
+    const result = await GET_DB()
+      .collection(BOARD_COLLECTION_NAME)
+      .findOneAndUpdate(
+        {
+          _id: new ObjectId(String(boardId))
+        },
+        { $push: { memberIds: new ObjectId(String(userId)) } },
+        {
+          // trả về 1 bản ghi đã được cập nhật
+          returnDocument: 'after'
+        }
+      );
+    return result;
+  } catch (e) {
+    throw new Error(e);
+  }
+};
 export const boardModel = {
   BOARD_COLLECTION_NAME,
   BOARD_COLLECTION_SCHEMA,
@@ -261,7 +280,8 @@ export const boardModel = {
   pushColumnOrderIds,
   pullColumnOrderIds,
   update,
-  getBoards
+  getBoards,
+  pushMemberIds
 };
 
 // boardId :6724facbf02917d1414ee601
