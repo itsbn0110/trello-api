@@ -22,5 +22,6 @@ export const corsOptions = {
   // Some legacy browsers (IE11, various SmartTVs) choke on 204
   optionsSuccessStatus: 200,
 
-  credentials: true
+  credentials: true,
+  preflightContinue: true // <--- Cho phép request OPTIONS
 };
