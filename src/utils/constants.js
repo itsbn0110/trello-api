@@ -5,7 +5,7 @@
 
 import { env } from '~/config/environment';
 
-export const WHITELIST_DOMAINS = ['https://trello-ui-baongo.vercel.app'];
+export const WHITELIST_DOMAINS = ['https://trello-ui-baongo.vercel.app/'];
 
 export const BOARD_TYPES = {
   PUBLIC: 'public',

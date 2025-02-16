@@ -5,8 +5,5 @@
  */
 {
   "presets": ["@babel/preset-env"],
-  "plugins": [
-    ["@babel/transform-runtime"],
-    ["module-resolver", { "alias": { "~": "./src" } }]
-  ]
+  "plugins": [["@babel/transform-runtime"], ["module-resolver", { "alias": { "~": "./src" } }]]
 }
